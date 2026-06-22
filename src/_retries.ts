@@ -1,0 +1,15 @@
+export const DEFAULT_MAX_RETRIES = 3;
+const INITIAL_BACKOFF_MS = 500;
+const MAX_BACKOFF_MS = 8_000;
+
+export const shouldRetry = (statusCode: number): boolean =>
+  statusCode === 429 || (statusCode >= 500 && statusCode < 600);
+
+// Exponential backoff with full jitter. `attempt` is 0-indexed.
+const backoffDelayMs = (attempt: number): number => {
+  const capped = Math.min(INITIAL_BACKOFF_MS * 2 ** attempt, MAX_BACKOFF_MS);
+  return Math.random() * capped;
+};
+
+export const sleepForAttempt = (attempt: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, backoffDelayMs(attempt)));

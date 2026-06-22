@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+# Dependencies are pinned in package-lock.json. `npm ci` installs exactly what's
+# in the lock and refuses to touch it, so CI is deterministic. Refreshing dep
+# versions happens via `npm install` (bumps the file, which goes through a PR),
+# not implicitly each CI run.
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['18', '20', '22']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+
+  install-smoke:
+    # Fresh-install check: simulates a clean install. Catches missing packaging
+    # metadata, missing index exports, broken import paths, etc. that working
+    # directory builds hide.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: node -e "const { Porter, Sandbox } = require('./dist/commonjs/index.js'); if (!Porter || !Sandbox) process.exit(1); console.log('cjs imports ok');"
+      - run: node --input-type=module -e "import('./dist/esm/index.js').then(m => { if (!m.Porter || !m.Sandbox) process.exit(1); console.log('esm imports ok'); });"
