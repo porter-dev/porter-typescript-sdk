@@ -37,10 +37,24 @@ const sb = await porter.sandboxes.create({
 });
 ```
 
-Set `PORTER_SANDBOX_API_KEY` in your environment, or pass `apiKey` when constructing the client.
-By default, the SDK connects to Porter's in-cluster sandbox API at
-`http://sandbox-api.porter-sandbox-system.svc.cluster.local:8080`. Override it
-with `PORTER_SANDBOX_BASE_URL` or by passing `baseUrl`.
+Inside a sandbox-enabled Porter cluster, the SDK connects to the in-cluster
+sandbox API at `http://sandbox-api.porter-sandbox-system.svc.cluster.local:8080`
+automatically, with no configuration needed.
+
+From outside the cluster, set the project and cluster where sandboxes are
+enabled, plus a Porter API token (created from **Settings > API tokens** in the
+Porter Dashboard):
+
+```bash
+export PORTER_PROJECT_ID=<project-id>
+export PORTER_CLUSTER_ID=<cluster-id>
+export PORTER_SANDBOX_API_KEY=<porter-api-token>
+```
+
+The SDK then calls the sandbox API through the Porter API at
+`dashboard.porter.run`. To target a specific URL instead, set
+`PORTER_SANDBOX_BASE_URL` or pass `baseUrl` - both take precedence over
+everything above.
 
 ### Concurrency
 
