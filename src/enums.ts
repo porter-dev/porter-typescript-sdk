@@ -18,6 +18,12 @@ export const LogLineLevel = {
 } as const;
 export type LogLineLevel = typeof LogLineLevel[keyof typeof LogLineLevel];
 
+export const SandboxDomainSpecVisibility = {
+  Public: "public",
+  Private: "private",
+} as const;
+export type SandboxDomainSpecVisibility = typeof SandboxDomainSpecVisibility[keyof typeof SandboxDomainSpecVisibility];
+
 export const SandboxesPhase = {
   Queued: "queued",
   Creating: "creating",

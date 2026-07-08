@@ -2,7 +2,7 @@
 
 
 import { describe, expect, it } from 'vitest';
-import type { CountPoint, CountResponse, CreateResponse, Error, ExecRequest, ExecResponse, ExecTarget, FilterValuesResponse, HealthResponse, LogsResponse, LookupResult, Pagination, ReadinessResponse, SandboxSpec, VolumeListResponse, VolumeSpec } from '../src/_models.js';
+import type { CountPoint, CountResponse, CreateResponse, Error, ExecRequest, ExecResponse, ExecTarget, FilterValuesResponse, HealthResponse, LogsResponse, LookupResult, Pagination, ReadinessResponse, SandboxDomainSpec, SandboxNetworkingSpec, SandboxSpec, VolumeListResponse, VolumeSpec } from '../src/_models.js';
 
 describe('model round trip', () => {
   it('accepts a structurally valid CountPoint', () => {
@@ -119,6 +119,20 @@ describe('model round trip', () => {
       active_sandboxes: 1,
     };
     const roundTripped = JSON.parse(JSON.stringify(value)) as ReadinessResponse;
+    expect(roundTripped).toEqual(value);
+  });
+
+  it('accepts a structurally valid SandboxDomainSpec', () => {
+    const value: SandboxDomainSpec = {};
+    const roundTripped = JSON.parse(JSON.stringify(value)) as SandboxDomainSpec;
+    expect(roundTripped).toEqual(value);
+  });
+
+  it('accepts a structurally valid SandboxNetworkingSpec', () => {
+    const value: SandboxNetworkingSpec = {
+      port: 1,
+    };
+    const roundTripped = JSON.parse(JSON.stringify(value)) as SandboxNetworkingSpec;
     expect(roundTripped).toEqual(value);
   });
 
