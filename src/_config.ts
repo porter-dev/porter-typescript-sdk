@@ -1,4 +1,4 @@
-const DEFAULT_BASE_URL = 'http://sandbox-api.porter-sandbox-system.svc.cluster.local:8080';
+const IN_CLUSTER_BASE_URL = 'http://sandbox-api.porter-sandbox-system.svc.cluster.local:8080';
 const DEFAULT_TIMEOUT_MS = 30_000;
 
 export interface Config {
@@ -13,11 +13,85 @@ export interface ConfigInput {
   timeoutMs?: number;
 }
 
+const externalBaseUrl = (projectId: number, clusterId: string): string =>
+  `https://dashboard.porter.run/api/v2/alpha/projects/${projectId}/clusters/${clusterId}`;
+
+// Reads the project_id claim from a Porter API token without verifying the signature.
+// Signature verification is the server's job; the SDK only needs the claim to build
+// the URL, and a tampered claim just produces a URL the server will reject.
+const projectIdFromApiKey = (apiKey: string): number => {
+  const error = new Error(
+    'PORTER_SANDBOX_API_KEY does not look like a Porter API token (expected a JWT with a ' +
+      'project_id claim). Create one from Settings > API tokens in the Porter Dashboard.',
+  );
+
+  const segments = apiKey.split('.');
+  const payloadSegment = segments[1];
+  if (segments.length !== 3 || payloadSegment === undefined) {
+    throw error;
+  }
+  let payload: unknown;
+  try {
+    payload = JSON.parse(Buffer.from(payloadSegment, 'base64url').toString('utf8'));
+  } catch {
+    throw error;
+  }
+
+  if (typeof payload !== 'object' || payload === null || !('project_id' in payload)) {
+    throw error;
+  }
+  const projectId = (payload as Record<string, unknown>).project_id;
+  if (typeof projectId !== 'number' || !Number.isInteger(projectId) || projectId <= 0) {
+    throw error;
+  }
+  return projectId;
+};
+
+const resolveBaseUrl = (baseUrl: string | undefined, apiKey: string | undefined): string => {
+  const explicit = baseUrl ?? process.env.PORTER_SANDBOX_BASE_URL;
+  if (explicit) {
+    return explicit;
+  }
+
+  const clusterId = process.env.PORTER_CLUSTER_ID;
+  if (clusterId) {
+    if (!apiKey) {
+      throw new Error(
+        'PORTER_CLUSTER_ID is set, so the SDK will call the Porter API from outside the ' +
+          'cluster, which requires an API token. Set PORTER_SANDBOX_API_KEY or pass apiKey. ' +
+          'You can create an API token from Settings > API tokens in the Porter Dashboard ' +
+          '(requires admin permissions).',
+      );
+    }
+    return externalBaseUrl(projectIdFromApiKey(apiKey), clusterId);
+  }
+
+  // Kubernetes sets KUBERNETES_SERVICE_HOST in every pod, so its presence means the
+  // in-cluster sandbox API service address is at least reachable in principle.
+  if (process.env.KUBERNETES_SERVICE_HOST) {
+    return IN_CLUSTER_BASE_URL;
+  }
+
+  if (apiKey) {
+    throw new Error(
+      'An API key is set but PORTER_CLUSTER_ID is not. Set PORTER_CLUSTER_ID to the cluster ' +
+        'where sandboxes are enabled so the SDK can call the Porter API from outside the cluster.',
+    );
+  }
+
+  throw new Error(
+    'Could not determine the sandbox API base URL. Either run inside a sandbox-enabled Porter ' +
+      'cluster, or set PORTER_CLUSTER_ID and PORTER_SANDBOX_API_KEY to call the Porter API ' +
+      'from outside the cluster. You can also set PORTER_SANDBOX_BASE_URL or pass baseUrl to ' +
+      'target a specific URL.',
+  );
+};
+
 export const resolveConfig = (input: ConfigInput = {}): Config => {
-  const rawBaseUrl = input.baseUrl ?? process.env.PORTER_SANDBOX_BASE_URL ?? DEFAULT_BASE_URL;
+  const apiKey = input.apiKey ?? process.env.PORTER_SANDBOX_API_KEY;
   return {
-    apiKey: input.apiKey ?? process.env.PORTER_SANDBOX_API_KEY,
-    baseUrl: rawBaseUrl.replace(/\/$/, ''),
+    apiKey,
+    baseUrl: resolveBaseUrl(input.baseUrl, apiKey).replace(/\/$/, ''),
     timeoutMs: input.timeoutMs ?? DEFAULT_TIMEOUT_MS,
   };
 };
