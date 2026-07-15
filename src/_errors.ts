@@ -46,6 +46,16 @@ export class ServerError extends SandboxError {
   }
 }
 
+// Raised when a request exceeds its timeout. Never retried by the client: the
+// server may still be executing the request (e.g. a long-running exec), so a
+// retry could run it again.
+export class SandboxTimeoutError extends SandboxError {
+  constructor(message: string) {
+    super(message);
+    this.name = 'SandboxTimeoutError';
+  }
+}
+
 // Map an HTTP status code to the appropriate SandboxError subclass.
 export const errorForStatus = (
   statusCode: number,

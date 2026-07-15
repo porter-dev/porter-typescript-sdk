@@ -1,4 +1,4 @@
-import { errorForStatus, SandboxError } from './_errors.js';
+import { errorForStatus, SandboxError, SandboxTimeoutError } from './_errors.js';
 import { resolveConfig, type Config, type ConfigInput } from './_config.js';
 import { DEFAULT_MAX_RETRIES, shouldRetry, sleepForAttempt } from './_retries.js';
 
@@ -13,6 +13,13 @@ export interface RequestOptions {
   path: string;
   query?: Record<string, unknown> | undefined;
   body?: unknown;
+  // Per-request timeout. `null` disables the timeout entirely, used for
+  // long-running calls like exec, where the API works for the full duration
+  // of the request. Omitted means the client-wide default.
+  timeoutMs?: number | null | undefined;
+  // Set false for calls that must not be re-sent (exec): a failed attempt may
+  // have executed server-side, so retrying could run the command again.
+  retry?: boolean | undefined;
 }
 
 // HTTP transport shared by the generated resource classes. Owns auth/header
@@ -36,16 +43,21 @@ export class BaseClient {
   async request<T>(options: RequestOptions): Promise<T> {
     const url = buildUrl(this.config.baseUrl, options.path, options.query);
     const init = buildInit(this.config, options);
+    const timeoutMs = options.timeoutMs === undefined ? this.config.timeoutMs : options.timeoutMs;
+    const maxRetries = options.retry === false ? 0 : this.maxRetries;
 
     let lastError: unknown = null;
 
-    for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
       let response: Response;
       try {
-        response = await withTimeout(fetch(url, init), this.config.timeoutMs);
+        response = await withTimeout(fetch(url, init), timeoutMs);
       } catch (err) {
+        // A timed-out request may have executed server-side, so retrying
+        // could run it again. Surface the timeout instead.
+        if (err instanceof SandboxTimeoutError) throw err;
         lastError = err;
-        if (attempt < this.maxRetries) {
+        if (attempt < maxRetries) {
           await sleepForAttempt(attempt);
           continue;
         }
@@ -56,7 +68,7 @@ export class BaseClient {
         return (await decodeBody(response)) as T;
       }
 
-      if (shouldRetry(response.status) && attempt < this.maxRetries) {
+      if (shouldRetry(response.status) && attempt < maxRetries) {
         await sleepForAttempt(attempt);
         continue;
       }
@@ -100,13 +112,15 @@ const buildInit = (config: Config, options: RequestOptions): RequestInit => {
   return { method: options.method, headers, body };
 };
 
-const withTimeout = <T>(promise: Promise<T>, timeoutMs: number): Promise<T> => {
+const withTimeout = <T>(promise: Promise<T>, timeoutMs: number | null): Promise<T> => {
+  // `null` disables the timeout: the caller waits as long as the request runs.
+  if (timeoutMs === null) return promise;
   // AbortController would be cleaner, but fetch in older Node 18 had spotty
   // signal support. setTimeout+race is universally supported and keeps the
   // pending fetch from leaking once we've already given up.
   let timer: NodeJS.Timeout | undefined;
   const timeout = new Promise<never>((_, reject) => {
-    timer = setTimeout(() => reject(new Error(`request timed out after ${timeoutMs}ms`)), timeoutMs);
+    timer = setTimeout(() => reject(new SandboxTimeoutError(`request timed out after ${timeoutMs}ms`)), timeoutMs);
   });
   return Promise.race([promise, timeout]).finally(() => {
     if (timer) clearTimeout(timer);

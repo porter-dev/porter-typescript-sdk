@@ -106,11 +106,13 @@ export class Sandboxes {
    *
    * Run a command in a running sandbox and return its output and exit code
    */
-  async exec(id: string, body: ExecRequest): Promise<ExecResponse> {
+  async exec(id: string, body: ExecRequest, requestOptions?: { timeoutMs?: number }): Promise<ExecResponse> {
     return this.client.request<ExecResponse>({
       method: 'POST',
       path: `/v1/sandbox/${id}/exec`,
       body,
+      timeoutMs: requestOptions?.timeoutMs ?? null,
+      retry: false,
     });
   }
 }
