@@ -165,6 +165,13 @@ export interface SandboxSpec {
   /** Environment variables to set in the sandbox, keyed by name */
   env?: Record<string, string>;
   /**
+   * Names of environment groups on the cluster whose variables are
+   * injected into the sandbox, resolved to their latest version at create
+   * time. On a key conflict a later group wins over an earlier one, and
+   * an explicit env entry wins over any group value.
+   */
+  env_groups?: string[];
+  /**
    * Volumes to mount, keyed by the absolute mount path inside the
    * sandbox; values are volume IDs.
    */
@@ -174,6 +181,11 @@ export interface SandboxSpec {
    * only one entry is supported.
    */
   networking?: SandboxNetworkingSpec[];
+  /**
+   * Maximum lifetime in seconds, counted from creation. The sandbox is
+   * terminated once it elapses. Omit for no limit.
+   */
+  ttl_seconds?: number;
 }
 
 export interface StatusResponse {
