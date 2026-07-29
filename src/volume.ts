@@ -81,6 +81,15 @@ export class Volume {
     return this.record.phase;
   }
 
+  /**
+   * Subdirectory, relative to the shared sandbox volumes mount, where this
+   * volume's data lives. An app that mounts the cluster's sandbox volumes
+   * reads this volume at `<mount>/<path>`.
+   */
+  get path(): string {
+    return this.record.path;
+  }
+
   /** IDs of the sandboxes the volume is attached to. */
   get attachedTo(): string[] {
     return this.record.attached_to;
