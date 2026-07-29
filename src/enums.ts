@@ -44,6 +44,12 @@ export const StatusResponsePhase = {
 } as const;
 export type StatusResponsePhase = typeof StatusResponsePhase[keyof typeof StatusResponsePhase];
 
+export const VolumeFileEntryType = {
+  File: "file",
+  Directory: "directory",
+} as const;
+export type VolumeFileEntryType = typeof VolumeFileEntryType[keyof typeof VolumeFileEntryType];
+
 export const VolumePhase = {
   Pending: "pending",
   Ready: "ready",
