@@ -2,7 +2,7 @@
 
 
 import { describe, expect, it } from 'vitest';
-import type { CountPoint, CountResponse, CreateResponse, Error, ExecRequest, ExecResponse, ExecTarget, FilterValuesResponse, HealthResponse, LogsResponse, LookupResult, Pagination, ReadinessResponse, SandboxDomainSpec, SandboxNetworkingSpec, SandboxSpec, VolumeListResponse, VolumeSpec } from '../src/_models.js';
+import type { CountPoint, CountResponse, CreateResponse, Error, ExecRequest, ExecResponse, ExecTarget, FilterValuesResponse, HealthResponse, LogsResponse, LookupResult, Pagination, ReadinessResponse, SandboxDomainSpec, SandboxEgressSpec, SandboxNetworkingSpec, SandboxSpec, VolumeFileListResponse, VolumeListResponse, VolumeSpec } from '../src/_models.js';
 
 describe('model round trip', () => {
   it('accepts a structurally valid CountPoint', () => {
@@ -128,6 +128,14 @@ describe('model round trip', () => {
     expect(roundTripped).toEqual(value);
   });
 
+  it('accepts a structurally valid SandboxEgressSpec', () => {
+    const value: SandboxEgressSpec = {
+      allowed_destinations: [],
+    };
+    const roundTripped = JSON.parse(JSON.stringify(value)) as SandboxEgressSpec;
+    expect(roundTripped).toEqual(value);
+  });
+
   it('accepts a structurally valid SandboxNetworkingSpec', () => {
     const value: SandboxNetworkingSpec = {
       port: 1,
@@ -141,6 +149,16 @@ describe('model round trip', () => {
       image: 'x',
     };
     const roundTripped = JSON.parse(JSON.stringify(value)) as SandboxSpec;
+    expect(roundTripped).toEqual(value);
+  });
+
+  it('accepts a structurally valid VolumeFileListResponse', () => {
+    const value: VolumeFileListResponse = {
+      path: 'x',
+      entries: [],
+      truncated: true,
+    };
+    const roundTripped = JSON.parse(JSON.stringify(value)) as VolumeFileListResponse;
     expect(roundTripped).toEqual(value);
   });
 

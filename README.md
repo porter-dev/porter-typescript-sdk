@@ -37,6 +37,20 @@ const sb = await porter.sandboxes.create({
 });
 ```
 
+Volume contents can be browsed and read directly from the volume handle:
+
+```typescript
+for (const file of await volume.listdir('/checkpoints')) {
+  console.log(file.path, file.sizeBytes);
+}
+
+const config = await volume.readText('/checkpoints/config.json');
+
+for await (const chunk of volume.stream('/checkpoints/model.safetensors')) {
+  process.stdout.write(chunk);
+}
+```
+
 Inside a sandbox-enabled Porter cluster, the SDK connects to the in-cluster
 sandbox API at `http://sandbox-api.porter-sandbox-system.svc.cluster.local:8080`
 automatically, with no configuration needed.
@@ -67,11 +81,13 @@ const sandboxes = await Promise.all(
 
 ## Layout
 
-- `src/sandbox.ts` — rich `Sandbox` handle (hand-written ergonomic API)
-- `src/porter.ts`, `src/sandboxes.ts`, `src/volumes.ts`, `src/healthz.ts`, `src/readyz.ts` — generated public `Porter` client and resource namespaces
-- `src/_client.ts`, `src/_models.ts`, `src/enums.ts`, `src/_errors.ts`, `src/resources/` — generated from the sandbox-api OpenAPI spec. Do not edit by hand.
-- `src/_baseClient.ts` — hand-written `fetch`-based HTTP transport (auth, retries, error mapping)
-- `src/_config.ts`, `src/_retries.ts` — hand-written runtime (env-var resolution, retry/backoff)
+Everything under `src/` is generated from the Porter Sandbox OpenAPI spec. Do
+not edit it by hand - changes there are overwritten on the next release.
+
+- `src/sandbox.ts`, `src/volume.ts` - `Sandbox` and `Volume` handles
+- `src/porter.ts`, `src/sandboxes.ts`, `src/volumes.ts`, `src/healthz.ts`, `src/readyz.ts` - public `Porter` client and resource namespaces
+- `src/_client.ts`, `src/_models.ts`, `src/enums.ts`, `src/_errors.ts`, `src/resources/` - low-level client, models, and errors
+- `src/_baseClient.ts`, `src/_config.ts`, `src/_retries.ts` - HTTP transport, env-var resolution, retry/backoff
 
 ## Development
 
@@ -80,10 +96,4 @@ npm install
 npm test
 npm run typecheck
 npm run build
-```
-
-To pull in a fresh generation from the sdk-gen workspace:
-
-```bash
-./scripts/sync-generated.sh /path/to/sdk-gen/out/typescript
 ```
