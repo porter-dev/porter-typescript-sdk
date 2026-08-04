@@ -45,6 +45,7 @@ export type {
   Volume as VolumeRecord,
   VolumeFileEntry,
   VolumeFileListResponse,
+  VolumeFileMoveRequest,
   VolumeListResponse,
   VolumeSpec,
 } from './_models.js';

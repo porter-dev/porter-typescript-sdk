@@ -307,6 +307,21 @@ export interface VolumeFileListResponse {
   truncated: boolean;
 }
 
+export interface VolumeFileMoveRequest {
+  /**
+   * File or directory to move, relative to the volume root, with or
+   * without a leading slash. A directory moves with everything under it.
+   */
+  from: string;
+  /**
+   * Where to move it to, relative to the volume root, with or without a
+   * leading slash. This is the entry's full new path rather than the
+   * directory to place it in, so a move renames and relocates in one call.
+   * The parent directory must already exist.
+   */
+  to: string;
+}
+
 export interface VolumeListResponse {
   /** All volumes in the cluster */
   volumes: Volume[];

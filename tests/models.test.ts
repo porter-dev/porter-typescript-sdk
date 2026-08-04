@@ -2,7 +2,7 @@
 
 
 import { describe, expect, it } from 'vitest';
-import type { CountPoint, CountResponse, CreateResponse, Error, ExecRequest, ExecResponse, ExecTarget, FilterValuesResponse, HealthResponse, LogsResponse, LookupResult, Pagination, ReadinessResponse, SandboxDomainSpec, SandboxEgressSpec, SandboxNetworkingSpec, SandboxSpec, VolumeFileListResponse, VolumeListResponse, VolumeSpec } from '../src/_models.js';
+import type { CountPoint, CountResponse, CreateResponse, Error, ExecRequest, ExecResponse, ExecTarget, FilterValuesResponse, HealthResponse, LogsResponse, LookupResult, Pagination, ReadinessResponse, SandboxDomainSpec, SandboxEgressSpec, SandboxNetworkingSpec, SandboxSpec, VolumeFileListResponse, VolumeFileMoveRequest, VolumeListResponse, VolumeSpec } from '../src/_models.js';
 
 describe('model round trip', () => {
   it('accepts a structurally valid CountPoint', () => {
@@ -159,6 +159,15 @@ describe('model round trip', () => {
       truncated: true,
     };
     const roundTripped = JSON.parse(JSON.stringify(value)) as VolumeFileListResponse;
+    expect(roundTripped).toEqual(value);
+  });
+
+  it('accepts a structurally valid VolumeFileMoveRequest', () => {
+    const value: VolumeFileMoveRequest = {
+      from: 'x',
+      to: 'x',
+    };
+    const roundTripped = JSON.parse(JSON.stringify(value)) as VolumeFileMoveRequest;
     expect(roundTripped).toEqual(value);
   });
 

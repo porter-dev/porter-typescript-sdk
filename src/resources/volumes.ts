@@ -2,7 +2,7 @@
 
 
 import type { BaseClient, BinaryContent } from '../_baseClient.js';
-import type { LookupResult, Volume, VolumeFileListResponse, VolumeListResponse, VolumeSpec } from '../_models.js';
+import type { LookupResult, Volume, VolumeFileListResponse, VolumeFileMoveRequest, VolumeListResponse, VolumeSpec } from '../_models.js';
 
 /** Volumes resource. */
 export class Volumes {
@@ -98,12 +98,51 @@ export class Volumes {
    * byte range (e.g. bytes=0-1048575) to read part of the file, or omit
    * the Range header for the whole file.
    */
-  async readFile(id: string, options: { path: string; range?: string }): Promise<BinaryContent> {
+  async readFile(id: string, options: { path: string; range?: string }, requestOptions?: { timeoutMs?: number }): Promise<BinaryContent> {
     return this.client.requestBinary({
       method: 'GET',
       path: `/v1/volume/${id}/files/content`,
       query: { path: options.path },
       headers: { Range: options.range },
+      timeoutMs: requestOptions?.timeoutMs ?? null,
+    });
+  }
+
+  /**
+   * Write volume file
+   *
+   * Write a file to a volume, replacing whatever is at the path and creating
+   * parent directories as needed. The request body is the file's raw bytes,
+   * of any size. The write is only visible at the path once the whole body
+   * has been received, so an upload that fails partway leaves the previous
+   * content in place rather than a truncated file.
+   */
+  async writeFile(id: string, body: Uint8Array, options: { path: string }, requestOptions?: { timeoutMs?: number }): Promise<void> {
+    return this.client.request<void>({
+      method: 'PUT',
+      path: `/v1/volume/${id}/files/content`,
+      query: { path: options.path },
+      body,
+      bodyContentType: 'application/octet-stream',
+      timeoutMs: requestOptions?.timeoutMs ?? null,
+    });
+  }
+
+  /**
+   * Move volume file
+   *
+   * Move or rename a file or directory inside a volume. The destination is
+   * the entry's full new path, so one call covers both renaming in place and
+   * relocating into another directory, and a directory moves with everything
+   * under it. The destination's parent directory must already exist, and a
+   * move onto a path something is already at is refused rather than
+   * overwriting it.
+   */
+  async moveFile(id: string, body: VolumeFileMoveRequest): Promise<void> {
+    return this.client.request<void>({
+      method: 'POST',
+      path: `/v1/volume/${id}/files/move`,
+      body,
     });
   }
 }
