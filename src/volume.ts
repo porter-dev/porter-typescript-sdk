@@ -164,6 +164,28 @@ export class Volume {
   }
 
   /**
+   * Write bytes to a file, and create parent directories as needed. The file
+   * appears at `path` only after the last byte, so an interrupted write leaves
+   * the previous content in place.
+   */
+  async writeFile(path: string, content: Uint8Array): Promise<void> {
+    await this.resource.writeFile(this.id, content, { path: normalizePath(path) });
+  }
+
+  /** Write UTF-8 text to a file. See {@link writeFile}. */
+  async writeText(path: string, content: string): Promise<void> {
+    await this.writeFile(path, new TextEncoder().encode(content));
+  }
+
+  /**
+   * Move or rename a file or directory, where `to` is the full new path of the
+   * entry. An occupied destination fails and leaves the entry where it was.
+   */
+  async moveFile(from: string, to: string): Promise<void> {
+    await this.resource.moveFile(this.id, { from: normalizePath(from), to: normalizePath(to) });
+  }
+
+  /**
    * Read a file in chunks, so a large one never lands in memory whole. Each
    * chunk is its own ranged request.
    */

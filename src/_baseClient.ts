@@ -17,9 +17,11 @@ export interface RequestOptions {
   query?: Record<string, unknown> | undefined;
   headers?: Record<string, string | undefined> | undefined;
   body?: unknown;
-  // Per-request timeout. `null` disables the timeout entirely, used for
-  // long-running calls like exec, where the API works for the full duration
-  // of the request. Omitted means the client-wide default.
+  // Set for a byte-bodied endpoint. The body goes out as-is under this content
+  // type.
+  bodyContentType?: string | undefined;
+  // Per-request timeout. `null` disables it, for a call the API works on for the
+  // full duration of the request. Omitted means the client-wide default.
   timeoutMs?: number | null | undefined;
   // Set false for calls that must not be re-sent (exec): a failed attempt may
   // have executed server-side, so retrying could run the command again.
@@ -149,11 +151,16 @@ const buildInit = (config: Config, options: RequestOptions, accept: string): Req
   for (const [name, value] of Object.entries(options.headers ?? {})) {
     if (value !== undefined) headers[name] = value;
   }
-  let body: string | undefined;
-  if (options.body !== undefined) {
-    headers['Content-Type'] = 'application/json';
-    body = JSON.stringify(options.body);
+  if (options.body === undefined) {
+    return { method: options.method, headers };
   }
+
+  // A byte body goes out untouched, and anything else is JSON. Content-Type is
+  // set alongside the body so the two agree.
+  headers['Content-Type'] = options.bodyContentType ?? 'application/json';
+  // A retry re-sends this body, so fetch must be able to read it twice. The
+  // byte-bodied methods take a Uint8Array for that reason.
+  const body = options.bodyContentType === undefined ? JSON.stringify(options.body) : (options.body as Uint8Array);
   return { method: options.method, headers, body };
 };
 
