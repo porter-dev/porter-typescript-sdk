@@ -99,6 +99,39 @@ export interface LookupResult {
   id: string;
 }
 
+/** p50/p90 CPU and memory usage over a lookback window with utilization against the sandbox's limits. Memory values include page cache, so they slightly overestimate resident memory. */
+export interface MetricSummaryResponse {
+  /** Lookback window the summary was computed over. */
+  window_seconds: number;
+  /**
+   * False when Prometheus returned no series for the sandbox's pod, which
+   * happens for freshly-started sandboxes (Prometheus scrapes at ~1m) and
+   * for pods shorter-lived than the [3m, 24h] window. When false, callers
+   * should render "no data yet" rather than the zeroed metric fields.
+   */
+  has_data: boolean;
+  /** 50th percentile CPU usage in cores. */
+  cpu_cores_p50: number;
+  /** 90th percentile CPU usage in cores. */
+  cpu_cores_p90: number;
+  /** CPU limit configured on the sandbox pod, in cores. Zero when no limit is set. */
+  cpu_limit_cores: number;
+  /** p50 CPU usage as a percentage of the CPU limit. Zero when no limit is set. */
+  cpu_util_p50_pct: number;
+  /** p90 CPU usage as a percentage of the CPU limit. Zero when no limit is set. */
+  cpu_util_p90_pct: number;
+  /** 50th percentile memory usage in bytes. Includes page cache. */
+  mem_bytes_p50: number;
+  /** 90th percentile memory usage in bytes. Includes page cache. */
+  mem_bytes_p90: number;
+  /** Memory limit configured on the sandbox pod, in bytes. Zero when no limit is set. */
+  mem_limit_bytes: number;
+  /** p50 memory usage as a percentage of the memory limit. Zero when no limit is set. */
+  mem_util_p50_pct: number;
+  /** p90 memory usage as a percentage of the memory limit. Zero when no limit is set. */
+  mem_util_p90_pct: number;
+}
+
 export interface Pagination {
   /** Current page number (1-based) */
   current_page: number;
@@ -163,6 +196,18 @@ export interface SandboxNetworkingSpec {
   domains?: SandboxDomainSpec[];
 }
 
+/**
+ * CPU and memory for the sandbox, as Kubernetes quantities. An omitted
+ * field keeps the cluster's default sandbox size for that resource. The
+ * sandbox can use up to the given amount.
+ */
+export interface SandboxResourcesSpec {
+  /** CPU cores, e.g. "2", "500m". */
+  cpu?: string;
+  /** Memory, e.g. "2Gi", "512Mi". */
+  memory?: string;
+}
+
 export interface SandboxSpec {
   /** Container image to run */
   image: string;
@@ -198,6 +243,7 @@ export interface SandboxSpec {
    */
   networking?: SandboxNetworkingSpec[];
   egress?: SandboxEgressSpec;
+  resources?: SandboxResourcesSpec;
   /**
    * Maximum lifetime in seconds, counted from creation. The sandbox is
    * terminated once it elapses. Omit for no limit.

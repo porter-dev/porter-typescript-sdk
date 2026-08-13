@@ -2,7 +2,7 @@
 
 
 import { describe, expect, it } from 'vitest';
-import type { CountPoint, CountResponse, CreateResponse, Error, ExecRequest, ExecResponse, ExecTarget, FilterValuesResponse, HealthResponse, LogsResponse, LookupResult, Pagination, ReadinessResponse, SandboxDomainSpec, SandboxEgressSpec, SandboxNetworkingSpec, SandboxSpec, VolumeFileListResponse, VolumeFileMoveRequest, VolumeListResponse, VolumeSpec } from '../src/_models.js';
+import type { CountPoint, CountResponse, CreateResponse, Error, ExecRequest, ExecResponse, ExecTarget, FilterValuesResponse, HealthResponse, LogsResponse, LookupResult, MetricSummaryResponse, Pagination, ReadinessResponse, SandboxDomainSpec, SandboxEgressSpec, SandboxNetworkingSpec, SandboxResourcesSpec, SandboxSpec, VolumeFileListResponse, VolumeFileMoveRequest, VolumeListResponse, VolumeSpec } from '../src/_models.js';
 
 describe('model round trip', () => {
   it('accepts a structurally valid CountPoint', () => {
@@ -103,6 +103,25 @@ describe('model round trip', () => {
     expect(roundTripped).toEqual(value);
   });
 
+  it('accepts a structurally valid MetricSummaryResponse', () => {
+    const value: MetricSummaryResponse = {
+      window_seconds: 1,
+      has_data: true,
+      cpu_cores_p50: 1,
+      cpu_cores_p90: 1,
+      cpu_limit_cores: 1,
+      cpu_util_p50_pct: 1,
+      cpu_util_p90_pct: 1,
+      mem_bytes_p50: 1,
+      mem_bytes_p90: 1,
+      mem_limit_bytes: 1,
+      mem_util_p50_pct: 1,
+      mem_util_p90_pct: 1,
+    };
+    const roundTripped = JSON.parse(JSON.stringify(value)) as MetricSummaryResponse;
+    expect(roundTripped).toEqual(value);
+  });
+
   it('accepts a structurally valid Pagination', () => {
     const value: Pagination = {
       current_page: 1,
@@ -141,6 +160,12 @@ describe('model round trip', () => {
       port: 1,
     };
     const roundTripped = JSON.parse(JSON.stringify(value)) as SandboxNetworkingSpec;
+    expect(roundTripped).toEqual(value);
+  });
+
+  it('accepts a structurally valid SandboxResourcesSpec', () => {
+    const value: SandboxResourcesSpec = {};
+    const roundTripped = JSON.parse(JSON.stringify(value)) as SandboxResourcesSpec;
     expect(roundTripped).toEqual(value);
   });
 
