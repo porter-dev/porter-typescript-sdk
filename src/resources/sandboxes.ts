@@ -2,7 +2,7 @@
 
 
 import type { BaseClient } from '../_baseClient.js';
-import type { CountResponse, CreateResponse, ExecRequest, ExecResponse, ListResponse, LogsResponse, LookupResult, SandboxSpec, StatusResponse } from '../_models.js';
+import type { CountResponse, CreateResponse, ExecRequest, ExecResponse, ListResponse, LogsResponse, LookupResult, MetricSummaryResponse, SandboxSpec, StatusResponse } from '../_models.js';
 import type { SandboxesPhase } from '../enums.js';
 
 /** Sandboxes resource. */
@@ -113,6 +113,22 @@ export class Sandboxes {
       body,
       timeoutMs: requestOptions?.timeoutMs ?? null,
       retry: false,
+    });
+  }
+
+  /**
+   * Get sandbox CPU and memory percentile summary
+   *
+   * Return p50/p90 CPU and memory usage over a lookback window for the
+   * sandbox, with utilization computed against the sandbox pod's limits.
+   * Memory values include page cache, so they slightly overestimate
+   * resident memory.
+   */
+  async getMetricsSummary(id: string, options?: { since?: string }): Promise<MetricSummaryResponse> {
+    return this.client.request<MetricSummaryResponse>({
+      method: 'GET',
+      path: `/v1/sandbox/${id}/metrics-summary`,
+      query: { since: options?.since },
     });
   }
 }
