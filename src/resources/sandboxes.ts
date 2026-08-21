@@ -2,8 +2,8 @@
 
 
 import type { BaseClient } from '../_baseClient.js';
-import type { CountResponse, CreateResponse, ExecRequest, ExecResponse, ListResponse, LogsResponse, LookupResult, MetricSummaryResponse, SandboxSpec, StatusResponse } from '../_models.js';
-import type { SandboxesPhase } from '../enums.js';
+import type { CountResponse, CreateResponse, ExecRequest, ExecResponse, ListResponse, LogsResponse, LookupResult, MetricSummaryResponse, SandboxMetricsResponse, SandboxSpec, StatusResponse } from '../_models.js';
+import type { SandboxMetric, SandboxesPhase } from '../enums.js';
 
 /** Sandboxes resource. */
 export class Sandboxes {
@@ -129,6 +129,21 @@ export class Sandboxes {
       method: 'GET',
       path: `/v1/sandbox/${id}/metrics-summary`,
       query: { since: options?.since },
+    });
+  }
+
+  /**
+   * Get sandbox time-series metrics
+   *
+   * Return the time series for a single metric of the sandbox over a range,
+   * queried against the cluster's Prometheus. Shaped like the app metrics
+   * response so the dashboard reuses the same chart selectors.
+   */
+  async getMetrics(id: string, options: { metric: SandboxMetric; startTimeUtc: string; endTimeUtc: string }): Promise<SandboxMetricsResponse> {
+    return this.client.request<SandboxMetricsResponse>({
+      method: 'GET',
+      path: `/v1/sandbox/${id}/metrics`,
+      query: { metric: options.metric, start_time_utc: options.startTimeUtc, end_time_utc: options.endTimeUtc },
     });
   }
 }

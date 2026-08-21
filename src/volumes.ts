@@ -3,7 +3,7 @@
 
 import type { VolumeSpec } from './_models.js';
 import type { Volumes as VolumesResource } from './resources/volumes.js';
-import { Volume } from './volume.js';
+import { type ObjectVolume, type Volume, wrapVolume } from './volume.js';
 
 /** User-facing volumes namespace under `Porter`. */
 export class Volumes {
@@ -14,20 +14,20 @@ export class Volumes {
     return this.resource;
   }
 
-  async create(body: VolumeSpec): Promise<Volume> {
+  async create(body: VolumeSpec): Promise<Volume | ObjectVolume> {
     const record = await this.resource.create(body);
-    return new Volume({ record, resource: this.resource });
+    return wrapVolume({ record, resource: this.resource });
   }
 
-  async list(): Promise<Volume[]> {
+  async list(): Promise<Array<Volume | ObjectVolume>> {
     const response = await this.resource.list();
-    return response.volumes.map((record) => new Volume({ record, resource: this.resource }));
+    return response.volumes.map((record) => wrapVolume({ record, resource: this.resource }));
   }
 
-  async get(name: string): Promise<Volume> {
+  async get(name: string): Promise<Volume | ObjectVolume> {
     const { id } = await this.resource.lookup({ name });
     const record = await this.resource.get(id);
-    return new Volume({ record, resource: this.resource });
+    return wrapVolume({ record, resource: this.resource });
   }
 
   async delete(name: string): Promise<void> {

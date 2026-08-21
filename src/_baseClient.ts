@@ -28,6 +28,16 @@ export interface RequestOptions {
   retry?: boolean | undefined;
 }
 
+/**
+ * The body a byte-bodied endpoint accepts.
+ *
+ * A `Blob` streams rather than buffers, so `fs.openAsBlob(path)` uploads a file
+ * without reading it into memory. Both forms can be read more than once, which
+ * a retry or a redirect needs. A bare `ReadableStream` is not accepted: it can
+ * only be read once, so it cannot survive either.
+ */
+export type BinaryBody = Uint8Array | Blob;
+
 /** A byte range within a file, read back from a response's Content-Range header. */
 export interface ContentRange {
   start: number;
@@ -91,7 +101,7 @@ export class BaseClient {
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       let response: Response;
       try {
-        response = await withTimeout(fetch(url, init), timeoutMs);
+        response = await sendFollowingRedirects(url, init, timeoutMs);
       } catch (err) {
         // A timed-out request may have executed server-side, so retrying
         // could run it again. Surface the timeout instead.
@@ -158,10 +168,50 @@ const buildInit = (config: Config, options: RequestOptions, accept: string): Req
   // A byte body goes out untouched, and anything else is JSON. Content-Type is
   // set alongside the body so the two agree.
   headers['Content-Type'] = options.bodyContentType ?? 'application/json';
-  // A retry re-sends this body, so fetch must be able to read it twice. The
-  // byte-bodied methods take a Uint8Array for that reason.
-  const body = options.bodyContentType === undefined ? JSON.stringify(options.body) : (options.body as Uint8Array);
+  // A retry or a redirect re-sends this body, so it must be readable twice.
+  // BinaryBody names the forms that are.
+  const body =
+    options.bodyContentType === undefined ? JSON.stringify(options.body) : (options.body as BinaryBody);
   return { method: options.method, headers, body };
+};
+
+const MAX_REDIRECTS = 5;
+
+/**
+ * Sends one attempt, and follows any redirect itself.
+ *
+ * The API answers a volume file write with a 307, which keeps the method and
+ * the body. Node cannot re-send a byte body on its own redirect path, so each
+ * hop is a fresh request that reads the caller's body again.
+ */
+const sendFollowingRedirects = async (
+  url: string,
+  init: RequestInit,
+  timeoutMs: number | null,
+): Promise<Response> => {
+  let current = url;
+  let headers = init.headers as Record<string, string>;
+
+  for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+    const response = await withTimeout(
+      fetch(current, { ...init, headers, redirect: 'manual' }),
+      timeoutMs,
+    );
+    const location =
+      response.status >= 300 && response.status < 400 ? response.headers.get('location') : null;
+    if (!location) return response;
+
+    const next = new URL(location, current);
+    // Credentials belong to the origin they were sent to, so a hop off that
+    // origin drops them.
+    if (next.origin !== new URL(current).origin) {
+      headers = { ...headers };
+      delete headers.Authorization;
+    }
+    current = next.toString();
+  }
+
+  throw new SandboxError(`Too many redirects for ${url}`);
 };
 
 const withTimeout = <T>(promise: Promise<T>, timeoutMs: number | null): Promise<T> => {

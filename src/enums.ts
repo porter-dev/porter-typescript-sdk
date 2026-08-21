@@ -34,6 +34,16 @@ export const SandboxesPhase = {
 } as const;
 export type SandboxesPhase = typeof SandboxesPhase[keyof typeof SandboxesPhase];
 
+export const SandboxMetric = {
+  CpuUsage: "cpu_usage",
+  CpuReserved: "cpu_reserved",
+  MemoryUsage: "memory_usage",
+  MemoryReserved: "memory_reserved",
+  NetworkRx: "network_rx",
+  NetworkTx: "network_tx",
+} as const;
+export type SandboxMetric = typeof SandboxMetric[keyof typeof SandboxMetric];
+
 export const StatusResponsePhase = {
   Queued: "queued",
   Creating: "creating",
@@ -50,9 +60,28 @@ export const VolumeFileEntryType = {
 } as const;
 export type VolumeFileEntryType = typeof VolumeFileEntryType[keyof typeof VolumeFileEntryType];
 
+export const VolumeObjectSpecAccess = {
+  ReadWrite: "read_write",
+  ReadOnly: "read_only",
+  WriteOnlyNewFiles: "write_only_new_files",
+} as const;
+export type VolumeObjectSpecAccess = typeof VolumeObjectSpecAccess[keyof typeof VolumeObjectSpecAccess];
+
 export const VolumePhase = {
   Pending: "pending",
   Ready: "ready",
   Failed: "failed",
 } as const;
 export type VolumePhase = typeof VolumePhase[keyof typeof VolumePhase];
+
+export const VolumeSpecType = {
+  Disk: "disk",
+  Object: "object",
+} as const;
+export type VolumeSpecType = typeof VolumeSpecType[keyof typeof VolumeSpecType];
+
+export const VolumeType = {
+  Disk: "disk",
+  Object: "object",
+} as const;
+export type VolumeType = typeof VolumeType[keyof typeof VolumeType];

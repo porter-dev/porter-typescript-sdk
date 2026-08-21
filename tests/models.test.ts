@@ -2,7 +2,7 @@
 
 
 import { describe, expect, it } from 'vitest';
-import type { CountPoint, CountResponse, CreateResponse, Error, ExecRequest, ExecResponse, ExecTarget, FilterValuesResponse, HealthResponse, LogsResponse, LookupResult, MetricSummaryResponse, Pagination, ReadinessResponse, SandboxDomainSpec, SandboxEgressSpec, SandboxNetworkingSpec, SandboxResourcesSpec, SandboxSpec, VolumeFileListResponse, VolumeFileMoveRequest, VolumeListResponse, VolumeSpec } from '../src/_models.js';
+import type { CountPoint, CountResponse, CreateResponse, Error, ExecRequest, ExecResponse, ExecTarget, FilterValuesResponse, HealthResponse, LogsResponse, LookupResult, MetricSummaryResponse, Pagination, ReadinessResponse, SandboxDomainSpec, SandboxEgressSpec, SandboxMetricsPoint, SandboxMetricsResponse, SandboxMetricsResult, SandboxMetricsSeries, SandboxNetworkingSpec, SandboxResourcesSpec, SandboxSpec, VolumeFileListResponse, VolumeFileMoveRequest, VolumeListResponse, VolumeObjectSpec, VolumeSpec } from '../src/_models.js';
 
 describe('model round trip', () => {
   it('accepts a structurally valid CountPoint', () => {
@@ -155,6 +155,39 @@ describe('model round trip', () => {
     expect(roundTripped).toEqual(value);
   });
 
+  it('accepts a structurally valid SandboxMetricsPoint', () => {
+    const value: SandboxMetricsPoint = {
+      timestamp_utc: 'x',
+      value: 1,
+    };
+    const roundTripped = JSON.parse(JSON.stringify(value)) as SandboxMetricsPoint;
+    expect(roundTripped).toEqual(value);
+  });
+
+  it('accepts a structurally valid SandboxMetricsResponse', () => {
+    const value: SandboxMetricsResponse = {
+      results: [],
+    };
+    const roundTripped = JSON.parse(JSON.stringify(value)) as SandboxMetricsResponse;
+    expect(roundTripped).toEqual(value);
+  });
+
+  it('accepts a structurally valid SandboxMetricsResult', () => {
+    const value: SandboxMetricsResult = {
+      series: [],
+    };
+    const roundTripped = JSON.parse(JSON.stringify(value)) as SandboxMetricsResult;
+    expect(roundTripped).toEqual(value);
+  });
+
+  it('accepts a structurally valid SandboxMetricsSeries', () => {
+    const value: SandboxMetricsSeries = {
+      time_series: [],
+    };
+    const roundTripped = JSON.parse(JSON.stringify(value)) as SandboxMetricsSeries;
+    expect(roundTripped).toEqual(value);
+  });
+
   it('accepts a structurally valid SandboxNetworkingSpec', () => {
     const value: SandboxNetworkingSpec = {
       port: 1,
@@ -201,6 +234,14 @@ describe('model round trip', () => {
       volumes: [],
     };
     const roundTripped = JSON.parse(JSON.stringify(value)) as VolumeListResponse;
+    expect(roundTripped).toEqual(value);
+  });
+
+  it('accepts a structurally valid VolumeObjectSpec', () => {
+    const value: VolumeObjectSpec = {
+      bucket: 'x',
+    };
+    const roundTripped = JSON.parse(JSON.stringify(value)) as VolumeObjectSpec;
     expect(roundTripped).toEqual(value);
   });
 
