@@ -3,14 +3,14 @@
 
 export { Porter } from './porter.js';
 export { Sandbox } from './sandbox.js';
-export { Volume, VolumeFile } from './volume.js';
+export { ObjectVolume, Volume, VolumeFile } from './volume.js';
 export { Healthz } from './healthz.js';
 export { Readyz } from './readyz.js';
 export { Sandboxes } from './sandboxes.js';
 export { Volumes } from './volumes.js';
 
 export { PorterSandboxApiClient } from './_client.js';
-export type { BinaryContent, ClientOptions, ContentRange } from './_baseClient.js';
+export type { BinaryBody, BinaryContent, ClientOptions, ContentRange } from './_baseClient.js';
 
 export {
   AuthenticationError,
@@ -40,6 +40,10 @@ export type {
   ReadinessResponse,
   SandboxDomainSpec,
   SandboxEgressSpec,
+  SandboxMetricsPoint,
+  SandboxMetricsResponse,
+  SandboxMetricsResult,
+  SandboxMetricsSeries,
   SandboxNetworkingSpec,
   SandboxResourcesSpec,
   SandboxSpec,
@@ -49,7 +53,8 @@ export type {
   VolumeFileListResponse,
   VolumeFileMoveRequest,
   VolumeListResponse,
+  VolumeObjectSpec,
   VolumeSpec,
 } from './_models.js';
 
-export { FilterValuesResponsePhases, LogLineLevel, SandboxDomainSpecVisibility, SandboxesPhase, StatusResponsePhase, VolumeFileEntryType, VolumePhase } from './enums.js';
+export { FilterValuesResponsePhases, LogLineLevel, SandboxDomainSpecVisibility, SandboxMetric, SandboxesPhase, StatusResponsePhase, VolumeFileEntryType, VolumeObjectSpecAccess, VolumePhase, VolumeSpecType, VolumeType } from './enums.js';
