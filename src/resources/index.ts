@@ -4,4 +4,5 @@
 export { Healthz } from './healthz.js';
 export { Readyz } from './readyz.js';
 export { Sandboxes } from './sandboxes.js';
+export { Snapshots } from './snapshots.js';
 export { Volumes } from './volumes.js';

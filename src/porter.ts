@@ -6,6 +6,7 @@ import { PorterSandboxApiClient } from './_client.js';
 import { Healthz } from './healthz.js';
 import { Readyz } from './readyz.js';
 import { Sandboxes } from './sandboxes.js';
+import { Snapshots } from './snapshots.js';
 import { Volumes } from './volumes.js';
 
 /** Top-level Porter client. */
@@ -13,6 +14,7 @@ export class Porter {
   readonly healthz: Healthz;
   readonly readyz: Readyz;
   readonly sandboxes: Sandboxes;
+  readonly snapshots: Snapshots;
   readonly volumes: Volumes;
 
   private readonly client: PorterSandboxApiClient;
@@ -22,6 +24,7 @@ export class Porter {
     this.healthz = new Healthz(this.client.healthz);
     this.readyz = new Readyz(this.client.readyz);
     this.sandboxes = new Sandboxes(this.client.sandboxes);
+    this.snapshots = new Snapshots(this.client.snapshots);
     this.volumes = new Volumes(this.client.volumes);
   }
 
