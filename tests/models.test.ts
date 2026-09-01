@@ -2,7 +2,7 @@
 
 
 import { describe, expect, it } from 'vitest';
-import type { CountPoint, CountResponse, CreateResponse, Error, ExecRequest, ExecResponse, ExecTarget, FilterValuesResponse, HealthResponse, LogsResponse, LookupResult, MetricSummaryResponse, Pagination, ReadinessResponse, SandboxDomainSpec, SandboxEgressSpec, SandboxMetricsPoint, SandboxMetricsResponse, SandboxMetricsResult, SandboxMetricsSeries, SandboxNetworkingSpec, SandboxResourcesSpec, SandboxSpec, VolumeFileListResponse, VolumeFileMoveRequest, VolumeListResponse, VolumeObjectSpec, VolumeSpec } from '../src/_models.js';
+import type { CountPoint, CountResponse, CreateResponse, Error, ExecRequest, ExecResponse, ExecTarget, FilterValuesResponse, HealthResponse, LogsResponse, LookupResult, MetricSummaryResponse, Pagination, ReadinessResponse, SandboxDomainSpec, SandboxEgressSpec, SandboxMetricsPoint, SandboxMetricsResponse, SandboxMetricsResult, SandboxMetricsSeries, SandboxNetworkingSpec, SandboxResourcesSpec, SandboxSpec, SnapshotListResponse, SnapshotSpec, VolumeFileListResponse, VolumeFileMoveRequest, VolumeListResponse, VolumeObjectSpec, VolumeSpec } from '../src/_models.js';
 
 describe('model round trip', () => {
   it('accepts a structurally valid CountPoint', () => {
@@ -207,6 +207,20 @@ describe('model round trip', () => {
       image: 'x',
     };
     const roundTripped = JSON.parse(JSON.stringify(value)) as SandboxSpec;
+    expect(roundTripped).toEqual(value);
+  });
+
+  it('accepts a structurally valid SnapshotListResponse', () => {
+    const value: SnapshotListResponse = {
+      snapshots: [],
+    };
+    const roundTripped = JSON.parse(JSON.stringify(value)) as SnapshotListResponse;
+    expect(roundTripped).toEqual(value);
+  });
+
+  it('accepts a structurally valid SnapshotSpec', () => {
+    const value: SnapshotSpec = {};
+    const roundTripped = JSON.parse(JSON.stringify(value)) as SnapshotSpec;
     expect(roundTripped).toEqual(value);
   });
 

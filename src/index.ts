@@ -7,6 +7,7 @@ export { ObjectVolume, Volume, VolumeFile } from './volume.js';
 export { Healthz } from './healthz.js';
 export { Readyz } from './readyz.js';
 export { Sandboxes } from './sandboxes.js';
+export { Snapshots } from './snapshots.js';
 export { Volumes } from './volumes.js';
 
 export { PorterSandboxApiClient } from './_client.js';
@@ -47,6 +48,9 @@ export type {
   SandboxNetworkingSpec,
   SandboxResourcesSpec,
   SandboxSpec,
+  Snapshot,
+  SnapshotListResponse,
+  SnapshotSpec,
   StatusResponse,
   Volume as VolumeRecord,
   VolumeFileEntry,
@@ -57,4 +61,4 @@ export type {
   VolumeSpec,
 } from './_models.js';
 
-export { FilterValuesResponsePhases, LogLineLevel, SandboxDomainSpecVisibility, SandboxMetric, SandboxesPhase, StatusResponsePhase, VolumeFileEntryType, VolumeObjectSpecAccess, VolumePhase, VolumeSpecType, VolumeType } from './enums.js';
+export { FilterValuesResponsePhases, LogLineLevel, SandboxDomainSpecVisibility, SandboxMetric, SandboxesPhase, SnapshotMode, SnapshotStatus, StatusResponsePhase, VolumeFileEntryType, VolumeObjectSpecAccess, VolumePhase, VolumeSpecType, VolumeType } from './enums.js';
