@@ -44,6 +44,19 @@ export const SandboxMetric = {
 } as const;
 export type SandboxMetric = typeof SandboxMetric[keyof typeof SandboxMetric];
 
+export const SnapshotMode = {
+  Filesystem: "filesystem",
+  Full: "full",
+} as const;
+export type SnapshotMode = typeof SnapshotMode[keyof typeof SnapshotMode];
+
+export const SnapshotStatus = {
+  Pending: "pending",
+  Ready: "ready",
+  Failed: "failed",
+} as const;
+export type SnapshotStatus = typeof SnapshotStatus[keyof typeof SnapshotStatus];
+
 export const StatusResponsePhase = {
   Queued: "queued",
   Creating: "creating",

@@ -5,6 +5,7 @@ import { BaseClient, type ClientOptions } from './_baseClient.js';
 import { Healthz } from './resources/healthz.js';
 import { Readyz } from './resources/readyz.js';
 import { Sandboxes } from './resources/sandboxes.js';
+import { Snapshots } from './resources/snapshots.js';
 import { Volumes } from './resources/volumes.js';
 
 /** Low-level client for the Porter sandbox API. */
@@ -14,6 +15,7 @@ export class PorterSandboxApiClient {
   readonly healthz: Healthz;
   readonly readyz: Readyz;
   readonly sandboxes: Sandboxes;
+  readonly snapshots: Snapshots;
   readonly volumes: Volumes;
 
   constructor(options: ClientOptions = {}) {
@@ -21,6 +23,7 @@ export class PorterSandboxApiClient {
     this.healthz = new Healthz(this.base);
     this.readyz = new Readyz(this.base);
     this.sandboxes = new Sandboxes(this.base);
+    this.snapshots = new Snapshots(this.base);
     this.volumes = new Volumes(this.base);
   }
 
