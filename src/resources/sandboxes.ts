@@ -3,7 +3,7 @@
 
 import type { BaseClient } from '../_baseClient.js';
 import type { CountResponse, CreateResponse, ExecRequest, ExecResponse, ListResponse, LogsResponse, LookupResult, MetricSummaryResponse, SandboxMetricsResponse, SandboxSpec, StatusResponse } from '../_models.js';
-import type { SandboxMetric, SandboxesPhase } from '../enums.js';
+import type { SandboxMetric, SandboxesPhase, SandboxesSource } from '../enums.js';
 
 /** Sandboxes resource. */
 export class Sandboxes {
@@ -81,10 +81,11 @@ export class Sandboxes {
    *
    * Terminate a sandbox and clean up its resources
    */
-  async delete(id: string): Promise<void> {
+  async delete(id: string, options?: { source?: SandboxesSource }): Promise<void> {
     return this.client.request<void>({
       method: 'DELETE',
       path: `/v1/sandbox/${id}`,
+      query: { source: options?.source },
     });
   }
 

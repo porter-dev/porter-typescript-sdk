@@ -34,6 +34,12 @@ export const SandboxesPhase = {
 } as const;
 export type SandboxesPhase = typeof SandboxesPhase[keyof typeof SandboxesPhase];
 
+export const SandboxesSource = {
+  Dashboard: "dashboard",
+  Cli: "cli",
+} as const;
+export type SandboxesSource = typeof SandboxesSource[keyof typeof SandboxesSource];
+
 export const SandboxMetric = {
   CpuUsage: "cpu_usage",
   CpuReserved: "cpu_reserved",
@@ -67,6 +73,18 @@ export const StatusResponsePhase = {
 } as const;
 export type StatusResponsePhase = typeof StatusResponsePhase[keyof typeof StatusResponsePhase];
 
+export const StatusResponseTerminationReason = {
+  Dashboard: "dashboard",
+  Cli: "cli",
+  Sdk: "sdk",
+  TtlExpired: "ttl_expired",
+  WorkloadExited: "workload_exited",
+  BackendLost: "backend_lost",
+  LaunchFailed: "launch_failed",
+  UserTerminated: "user_terminated",
+} as const;
+export type StatusResponseTerminationReason = typeof StatusResponseTerminationReason[keyof typeof StatusResponseTerminationReason];
+
 export const VolumeFileEntryType = {
   File: "file",
   Directory: "directory",
@@ -79,6 +97,12 @@ export const VolumeObjectSpecAccess = {
   WriteOnlyNewFiles: "write_only_new_files",
 } as const;
 export type VolumeObjectSpecAccess = typeof VolumeObjectSpecAccess[keyof typeof VolumeObjectSpecAccess];
+
+export const VolumeObjectSpecMode = {
+  Object: "object",
+  Filesystem: "filesystem",
+} as const;
+export type VolumeObjectSpecMode = typeof VolumeObjectSpecMode[keyof typeof VolumeObjectSpecMode];
 
 export const VolumePhase = {
   Pending: "pending",

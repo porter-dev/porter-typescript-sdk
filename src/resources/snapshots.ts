@@ -36,6 +36,18 @@ export class Snapshots {
   }
 
   /**
+   * Get snapshot
+   *
+   * Get one snapshot by id, including its current capture status.
+   */
+  async get(id: string): Promise<Snapshot> {
+    return this.client.request<Snapshot>({
+      method: 'GET',
+      path: `/v1/snapshot/${id}`,
+    });
+  }
+
+  /**
    * Delete snapshot
    *
    * Delete a snapshot and everything it captured.
