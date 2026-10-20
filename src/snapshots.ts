@@ -21,6 +21,10 @@ export class Snapshots {
     return this.resource.list(options);
   }
 
+  async get(id: string): Promise<Snapshot> {
+    return this.resource.get(id);
+  }
+
   async delete(id: string): Promise<void> {
     await this.resource.delete(id);
   }
