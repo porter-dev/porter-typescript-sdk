@@ -156,7 +156,9 @@ export interface SandboxDomainSpec {
    * target ingress's domain. Unlike name it need not be unique, so
    * successive sandboxes can reuse one hostname (only one may be live
    * at a time). Defaults to <name>.<ingress domain>, then
-   * <id>.<ingress domain>, when omitted.
+   * <id>.<ingress domain>, when omitted. Not available on Porter-hosted
+   * sandboxes, which are always served at
+   * <name>-<8 random characters>.<ingress domain>.
    */
   domain?: string;
   /**
@@ -249,9 +251,10 @@ export interface SandboxResourcesSpec {
 export interface SandboxSpec {
   /**
    * Container image to run. Empty when snapshot_id is set, since the
-   * snapshot is the image.
+   * snapshot is the image. When both are omitted, the sandbox runs
+   * python:3.14-slim, and with no command or args it runs sleep infinity.
    */
-  image: string;
+  image?: string;
   /**
    * Start the sandbox from this snapshot's filesystem instead of an image,
    * so image must be left unset. The snapshot carries no command or volumes:
