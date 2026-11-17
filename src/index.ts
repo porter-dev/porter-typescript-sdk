@@ -56,9 +56,11 @@ export type {
   VolumeFileEntry,
   VolumeFileListResponse,
   VolumeFileMoveRequest,
+  VolumeFileUrl,
+  VolumeFileUrlRequest,
   VolumeListResponse,
   VolumeObjectSpec,
   VolumeSpec,
 } from './_models.js';
 
-export { FilterValuesResponsePhases, LogLineLevel, SandboxDomainSpecVisibility, SandboxMetric, SandboxesPhase, SandboxesSource, SnapshotMode, SnapshotStatus, StatusResponsePhase, StatusResponseTerminationReason, VolumeFileEntryType, VolumeObjectSpecAccess, VolumeObjectSpecMode, VolumePhase, VolumeSpecType, VolumeType } from './enums.js';
+export { FilterValuesResponsePhases, LogLineLevel, SandboxDomainSpecVisibility, SandboxMetric, SandboxesPhase, SandboxesSource, SnapshotMode, SnapshotStatus, StatusResponsePhase, StatusResponseTerminationReason, VolumeFileEntryType, VolumeFileUrlMethod, VolumeFileUrlRequestMethod, VolumeObjectSpecAccess, VolumeObjectSpecMode, VolumePhase, VolumeSpecType, VolumeType } from './enums.js';

@@ -2,7 +2,7 @@
 
 
 import type { BaseClient, BinaryBody, BinaryContent } from '../_baseClient.js';
-import type { LookupResult, Volume, VolumeFileListResponse, VolumeFileMoveRequest, VolumeListResponse, VolumeSpec } from '../_models.js';
+import type { LookupResult, Volume, VolumeFileListResponse, VolumeFileMoveRequest, VolumeFileUrl, VolumeFileUrlRequest, VolumeListResponse, VolumeSpec } from '../_models.js';
 
 /** Volumes resource. */
 export class Volumes {
@@ -142,6 +142,24 @@ export class Volumes {
     return this.client.request<void>({
       method: 'POST',
       path: `/v1/volume/${id}/files/move`,
+      body,
+    });
+  }
+
+  /**
+   * Sign a volume file URL
+   *
+   * Returns a URL that allows its method on one file of the volume, any
+   * number of times, until it expires, with no other credentials: GET (and HEAD) to read the file,
+   * PUT to write it. A PUT URL can carry a write condition, which the
+   * upload cannot drop: if_none_match only creates a new file, and if_match
+   * only replaces the file at that version (both fail with 412 otherwise).
+   * The response also carries the file's current ETag.
+   */
+  async createFileUrl(id: string, body: VolumeFileUrlRequest): Promise<VolumeFileUrl> {
+    return this.client.request<VolumeFileUrl>({
+      method: 'POST',
+      path: `/v1/volume/${id}/files/url`,
       body,
     });
   }

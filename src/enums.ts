@@ -79,6 +79,7 @@ export const StatusResponseTerminationReason = {
   Sdk: "sdk",
   TtlExpired: "ttl_expired",
   WorkloadExited: "workload_exited",
+  MemoryLimit: "memory_limit",
   BackendLost: "backend_lost",
   LaunchFailed: "launch_failed",
   UserTerminated: "user_terminated",
@@ -90,6 +91,18 @@ export const VolumeFileEntryType = {
   Directory: "directory",
 } as const;
 export type VolumeFileEntryType = typeof VolumeFileEntryType[keyof typeof VolumeFileEntryType];
+
+export const VolumeFileUrlMethod = {
+  Get: "GET",
+  Put: "PUT",
+} as const;
+export type VolumeFileUrlMethod = typeof VolumeFileUrlMethod[keyof typeof VolumeFileUrlMethod];
+
+export const VolumeFileUrlRequestMethod = {
+  Get: "GET",
+  Put: "PUT",
+} as const;
+export type VolumeFileUrlRequestMethod = typeof VolumeFileUrlRequestMethod[keyof typeof VolumeFileUrlRequestMethod];
 
 export const VolumeObjectSpecAccess = {
   ReadWrite: "read_write",
