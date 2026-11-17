@@ -3,8 +3,8 @@
 
 import type { BinaryBody } from './_baseClient.js';
 import { SandboxError } from './_errors.js';
-import type { Volume as VolumeRecord, VolumeFileEntry, VolumeObjectSpec } from './_models.js';
-import type { VolumeFileEntryType, VolumePhase, VolumeType } from './enums.js';
+import type { Volume as VolumeRecord, VolumeFileEntry, VolumeFileUrl, VolumeObjectSpec } from './_models.js';
+import type { VolumeFileEntryType, VolumeFileUrlRequestMethod, VolumePhase, VolumeType } from './enums.js';
 import type { Volumes as VolumesResource } from './resources/volumes.js';
 
 // How much of a file one request of `stream` reads. Files are read through
@@ -202,6 +202,42 @@ export class Volume extends BaseVolume {
    */
   async moveFile(from: string, to: string): Promise<void> {
     await this.resource.moveFile(this.id, { from: normalizePath(from), to: normalizePath(to) });
+  }
+
+  /**
+   * Sign a URL that allows its method on one file, any number of times, until
+   * it expires, with no Porter credentials. Hand it to whoever should read or
+   * write the file, such as a browser or another service, and keep it out of
+   * logs.
+   *
+   * - `method: 'GET'` (the default) downloads the file; HEAD works too.
+   *   `downloadName` is the name a browser saves it under.
+   * - `method: 'PUT'` uploads it. `ifNoneMatch: true` only creates the file,
+   *   and `ifMatch: etag` only replaces that version; otherwise the upload
+   *   answers 412.
+   *
+   * A URL lives 15 minutes unless `expiresInSeconds` says otherwise, at most 7
+   * days. The result carries the file's current ETag, empty when nothing is at
+   * the path yet.
+   */
+  async fileUrl(
+    path: string,
+    options: {
+      method?: VolumeFileUrlRequestMethod;
+      expiresInSeconds?: number;
+      ifMatch?: string;
+      ifNoneMatch?: boolean;
+      downloadName?: string;
+    } = {},
+  ): Promise<VolumeFileUrl> {
+    return this.resource.createFileUrl(this.id, {
+      path: normalizePath(path),
+      method: options.method ?? 'GET',
+      expires_in_seconds: options.expiresInSeconds,
+      if_match: options.ifMatch,
+      if_none_match: options.ifNoneMatch,
+      download_name: options.downloadName,
+    });
   }
 
   /**

@@ -203,9 +203,7 @@ describe('model round trip', () => {
   });
 
   it('accepts a structurally valid SandboxSpec', () => {
-    const value: SandboxSpec = {
-      image: 'x',
-    };
+    const value: SandboxSpec = {};
     const roundTripped = JSON.parse(JSON.stringify(value)) as SandboxSpec;
     expect(roundTripped).toEqual(value);
   });
